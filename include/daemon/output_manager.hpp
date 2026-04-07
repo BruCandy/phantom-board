@@ -5,7 +5,7 @@
 #include <string>
 
 
-namespace bunnyboard::daemon
+namespace phantomboard::daemon
 {
 class OutputManager {
 public:

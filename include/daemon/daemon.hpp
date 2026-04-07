@@ -12,7 +12,7 @@
 #include "types.hpp"
 
 
-namespace bunnyboard::daemon
+namespace phantomboard::daemon
 {
 class Daemon {
 public:
@@ -26,7 +26,7 @@ public:
     void run();
     void stop();
 
-    BunnyMode mode();
+    PhantomMode mode();
     TextBufferView bufferView();
 
 private:

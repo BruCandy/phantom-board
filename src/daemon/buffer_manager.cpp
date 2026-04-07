@@ -2,7 +2,7 @@
 #include "buffer_manager.hpp"
 
 
-namespace bunnyboard::daemon
+namespace phantomboard::daemon
 {
 BufferManager::BufferManager()
 {

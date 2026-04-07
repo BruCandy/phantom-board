@@ -3,9 +3,9 @@ DIR=$(cd "$(dirname "$0")/.." && pwd)
 BUILD="$DIR/build"
 
 cd "$BUILD"
-if [ -e bunnyboard-daemon ]; then
-    ./bunnyboard-daemon $1
+if [ -e phantomboard-daemon ]; then
+    ./phantomboard-daemon $1
 else
-    echo "No bunnyboard-daemon file"
+    echo "No phantomboard-daemon file"
     exit 1
 fi

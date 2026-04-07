@@ -7,7 +7,7 @@
 
 
 int main(int argc, char *argv[]) {
-    constexpr const char* kInputDevicePrefix = "/dev/input/bunny-kbd-";
+    constexpr const char* kInputDevicePrefix = "/dev/input/phantom-kbd-";
 
     if (argc < 2) {
         std::cerr << "Not enough arguments were given" << std::endl;
@@ -18,10 +18,10 @@ int main(int argc, char *argv[]) {
     ss << kInputDevicePrefix << argv[1];
     std::string input_device_path = ss.str();
 
-    bunnyboard::daemon::Daemon daemon{input_device_path};
+    phantomboard::daemon::Daemon daemon{input_device_path};
 
     if (!daemon.initialize()) {
-        std::cerr << "Failed to initialize bunnyboard-daemon" << std::endl;
+        std::cerr << "Failed to initialize phantomboard-daemon" << std::endl;
         return 1;
     }
 

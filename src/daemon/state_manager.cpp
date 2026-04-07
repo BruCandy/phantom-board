@@ -2,7 +2,7 @@
 #include "state_manager.hpp"
 
 
-namespace bunnyboard::daemon
+namespace phantomboard::daemon
 {
 StateManager::StateManager() 
 {
@@ -12,28 +12,28 @@ StateManager::~StateManager()
 {
 }
 
-BunnyMode StateManager::getMode() 
+PhantomMode StateManager::getMode() 
 {
     return mode_;
 }
 
 bool StateManager::checkNormal() 
 {
-    return mode_ == BunnyMode::Normal;
+    return mode_ == PhantomMode::Normal;
 }
 
-bool StateManager::checkBunny() 
+bool StateManager::checkPhantom() 
 {
-    return mode_ == BunnyMode::Bunny;
+    return mode_ == PhantomMode::Phantom;
 }
 
-void StateManager::setMode(BunnyMode mode) 
+void StateManager::setMode(PhantomMode mode) 
 {
     mode_ = mode;
 }
 
 void StateManager::toggleMode() 
 {
-    mode_ = (mode_ == BunnyMode::Normal) ? BunnyMode::Bunny : BunnyMode::Normal;
+    mode_ = (mode_ == PhantomMode::Normal) ? PhantomMode::Phantom : PhantomMode::Normal;
 }
 }

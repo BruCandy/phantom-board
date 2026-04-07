@@ -7,11 +7,11 @@
 #include <string>
 
 
-namespace bunnyboard::daemon
+namespace phantomboard::daemon
 {
-enum class BunnyMode {
+enum class PhantomMode {
     Normal,
-    Bunny,
+    Phantom,
 };
 
 enum class InputActionType {

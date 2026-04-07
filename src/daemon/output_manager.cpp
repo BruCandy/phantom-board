@@ -86,7 +86,7 @@ bool writeEvent(int fd, int type, int code, int value) {
 }
 
 
-namespace bunnyboard::daemon 
+namespace phantomboard::daemon 
 {
 OutputManager::OutputManager()
 {
@@ -122,7 +122,7 @@ bool OutputManager::initialize()
     }
 
     struct uinput_user_dev uidev {};
-    std::snprintf(uidev.name, UINPUT_MAX_NAME_SIZE, "bunnyboard-virtual-keyboard");
+    std::snprintf(uidev.name, UINPUT_MAX_NAME_SIZE, "phantomboard-virtual-keyboard");
     uidev.id.bustype = BUS_USB;
     uidev.id.vendor = 0x1234;
     uidev.id.product = 0x5678;

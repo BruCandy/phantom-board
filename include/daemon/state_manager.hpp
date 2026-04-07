@@ -6,7 +6,7 @@
 #include "types.hpp"
 
 
-namespace bunnyboard::daemon
+namespace phantomboard::daemon
 {
 
 class StateManager {
@@ -14,15 +14,15 @@ public:
     StateManager();
     ~StateManager();
 
-    BunnyMode getMode();
+    PhantomMode getMode();
     bool checkNormal();
-    bool checkBunny();
+    bool checkPhantom();
 
-    void setMode(BunnyMode mode);
+    void setMode(PhantomMode mode);
     void toggleMode();
 
 private:
-    BunnyMode mode_ = BunnyMode::Normal;
+    PhantomMode mode_ = PhantomMode::Normal;
 };
 }
 

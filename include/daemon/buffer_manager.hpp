@@ -9,7 +9,7 @@
 #include "types.hpp"
 
 
-namespace bunnyboard::daemon
+namespace phantomboard::daemon
 {
 class BufferManager {
 public:

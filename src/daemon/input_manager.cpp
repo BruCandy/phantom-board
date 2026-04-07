@@ -53,7 +53,7 @@ char keycodeToAscii(int code, bool shift) {
 }
 
 
-namespace bunnyboard::daemon
+namespace phantomboard::daemon
 {
 InputManager::InputManager()
 {
