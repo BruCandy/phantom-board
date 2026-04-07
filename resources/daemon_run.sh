@@ -4,7 +4,7 @@ BUILD="$DIR/build"
 
 cd "$BUILD"
 if [ -e bunnyboard-daemon ]; then
-    ./bunnyboard-daemon
+    ./bunnyboard-daemon $1
 else
     echo "No bunnyboard-daemon file"
     exit 1

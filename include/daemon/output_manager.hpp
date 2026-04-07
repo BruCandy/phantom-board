@@ -24,6 +24,8 @@ public:
     bool emitKey(int keycode);
     bool emitText(const std::string& text);
 
+    bool throwEvent(struct input_event event);
+
 private:
     bool emitKeyEvent(int keycode, int value);
     bool emitSyn();

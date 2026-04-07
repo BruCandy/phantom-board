@@ -213,4 +213,14 @@ bool OutputManager::emitText(const std::string& text)
 
     return true;
 }
+
+bool OutputManager::throwEvent(struct input_event event)
+{
+    if (fd_ < 0) {
+        return false;
+    }
+
+    const ssize_t n = ::write(fd_, &event, sizeof(event));
+    return n == static_cast<ssize_t>(sizeof(event));
+}
 }

@@ -1,4 +1,8 @@
+#include <cerrno>
 #include <iostream>
+
+// linux
+#include <linux/input.h>
 
 // original
 #include "daemon.hpp"
@@ -44,9 +48,15 @@ void Daemon::run()
             std::cerr << "Failed to read input event" << std::endl;
             break;
         }
-
+        
         const InputAction action = input_.translateEvent(event);
         handleAction(action);
+
+        if (!state_.checkBunny()) {
+            if (output_.throwEvent(event)) {
+                std::cerr << "Failed to throw event" << std::endl;
+            }
+        }
     }
 }
 
