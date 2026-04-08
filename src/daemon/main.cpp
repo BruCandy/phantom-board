@@ -1,12 +1,15 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <unistd.h>
 
 // original
 #include "daemon.hpp"
 
 
 int main(int argc, char *argv[]) {
+    usleep(100000);
+    
     constexpr const char* kInputDevicePrefix = "/dev/input/phantom-kbd-";
 
     if (argc < 2) {

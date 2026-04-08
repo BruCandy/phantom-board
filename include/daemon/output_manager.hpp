@@ -22,13 +22,11 @@ public:
     int fd();
 
     bool emitKey(int keycode);
+    bool emitKeyEvent(int keycode, int value);
+    bool emitSyn();
     bool emitText(const std::string& text);
 
     bool throwEvent(struct input_event event);
-
-private:
-    bool emitKeyEvent(int keycode, int value);
-    bool emitSyn();
 
 private:
     int fd_ = -1;

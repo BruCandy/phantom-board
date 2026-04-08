@@ -53,7 +53,7 @@ void Daemon::run()
         handleAction(action);
 
         if (!state_.checkPhantom()) {
-            if (output_.throwEvent(event)) {
+            if (!output_.throwEvent(event)) {
                 std::cerr << "Failed to throw event" << std::endl;
             }
         }
@@ -83,7 +83,12 @@ void Daemon::handleAction(const InputAction& action)
 
     case InputActionType::ToggleMode:
         state_.toggleMode();
-        std::cout << "Mode: " << (state_.checkPhantom() ? "Phantom" : "Normal") << std::endl;
+        if (state_.checkPhantom()) {
+            output_.emitKeyEvent(KEY_LEFTSHIFT, 0);
+            output_.emitKeyEvent(KEY_RIGHTSHIFT, 0);
+            output_.emitSyn();
+        }
+        std::cout << std::endl << "Mode: " << (state_.checkPhantom() ? "Phantom" : "Normal") << std::endl;
         break;
 
     case InputActionType::InsertChar:
