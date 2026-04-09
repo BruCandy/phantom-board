@@ -12,14 +12,26 @@
 
 namespace
 {
-bool checkAsciiLetterKey(int code) {
-    return code >= KEY_A && code <= KEY_Z;
+constexpr int alpha_keys[26] = {
+    KEY_A, KEY_B, KEY_C, KEY_D, KEY_E, KEY_F, KEY_G, KEY_H, KEY_I,
+    KEY_J, KEY_K, KEY_L, KEY_M, KEY_N, KEY_O, KEY_P, KEY_Q, KEY_R,
+    KEY_S, KEY_T, KEY_U, KEY_V, KEY_W, KEY_X, KEY_Y, KEY_Z
+};
+
+int alphaIndex(int code)
+{
+    for (int i = 0; i < 26; i++) {
+        if (alpha_keys[i] == code) return i;
+    }
+    return -1;
 }
 
-char keycodeToAscii(int code, bool shift) {
-    if (checkAsciiLetterKey(code)) {
+char keycodeToAscii(int code, bool shift)
+{
+    const int idx = alphaIndex(code);
+    if (idx >= 0) {
         const char base = shift ? 'A' : 'a';
-        return static_cast<char>(base + (code - KEY_A));
+        return static_cast<char>(base + idx);
     }
 
     if (code >= KEY_1 && code <= KEY_9) {

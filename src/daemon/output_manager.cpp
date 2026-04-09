@@ -15,16 +15,23 @@
 
 namespace
 {
-int asciiToKeycode(char c, bool& need_shift) {
+constexpr int alphabet_keys[26] = {
+    KEY_A, KEY_B, KEY_C, KEY_D, KEY_E, KEY_F, KEY_G, KEY_H, KEY_I,
+    KEY_J, KEY_K, KEY_L, KEY_M, KEY_N, KEY_O, KEY_P, KEY_Q, KEY_R,
+    KEY_S, KEY_T, KEY_U, KEY_V, KEY_W, KEY_X, KEY_Y, KEY_Z
+};
+
+int asciiToKeycode(char c, bool& need_shift)
+{
     need_shift = false;
 
     if (c >= 'a' && c <= 'z') {
-        return KEY_A + (c - 'a');
+        return alphabet_keys[c - 'a'];
     }
 
     if (c >= 'A' && c <= 'Z') {
         need_shift = true;
-        return KEY_A + (c - 'A');
+        return alphabet_keys[c - 'A'];
     }
 
     if (c >= '1' && c <= '9') {
@@ -36,39 +43,55 @@ int asciiToKeycode(char c, bool& need_shift) {
     }
 
     switch (c) {
-        case ' ': return KEY_SPACE;
-        case '-': return KEY_MINUS;
-        case '_': need_shift = true; return KEY_MINUS;
-        case '=': return KEY_EQUAL;
-        case '+': need_shift = true; return KEY_EQUAL;
-        case '[': return KEY_LEFTBRACE;
-        case '{': need_shift = true; return KEY_LEFTBRACE;
-        case ']': return KEY_RIGHTBRACE;
-        case '}': need_shift = true; return KEY_RIGHTBRACE;
-        case '\\': return KEY_BACKSLASH;
-        case '|': need_shift = true; return KEY_BACKSLASH;
-        case ';': return KEY_SEMICOLON;
-        case ':': need_shift = true; return KEY_SEMICOLON;
-        case '\'': return KEY_APOSTROPHE;
-        case '"': need_shift = true; return KEY_APOSTROPHE;
-        case '`': return KEY_GRAVE;
-        case '~': need_shift = true; return KEY_GRAVE;
-        case ',': return KEY_COMMA;
-        case '<': need_shift = true; return KEY_COMMA;
-        case '.': return KEY_DOT;
-        case '>': need_shift = true; return KEY_DOT;
-        case '/': return KEY_SLASH;
-        case '?': need_shift = true; return KEY_SLASH;
-        case '!': need_shift = true; return KEY_1;
-        case '@': need_shift = true; return KEY_2;
-        case '#': need_shift = true; return KEY_3;
-        case '$': need_shift = true; return KEY_4;
-        case '%': need_shift = true; return KEY_5;
-        case '^': need_shift = true; return KEY_6;
-        case '&': need_shift = true; return KEY_7;
-        case '*': need_shift = true; return KEY_8;
-        case '(': need_shift = true; return KEY_9;
-        case ')': need_shift = true; return KEY_0;
+        case ' ':   return KEY_SPACE;
+
+        case '-':   return KEY_MINUS;
+        case '=':   need_shift = true; return KEY_MINUS;
+
+        case '^':   return KEY_EQUAL;
+        case '~':   need_shift = true; return KEY_EQUAL;
+
+        case '\\':  return KEY_YEN;
+        case '|':   need_shift = true; return KEY_YEN; 
+
+        case '@':   return KEY_LEFTBRACE;
+        case '`':   need_shift = true; return KEY_LEFTBRACE;
+
+        case '[':   return KEY_RIGHTBRACE;
+        case '{':   need_shift = true; return KEY_RIGHTBRACE;
+
+        case ';':   return KEY_SEMICOLON;
+        case '+':   need_shift = true; return KEY_SEMICOLON;
+
+        case ':':   return KEY_APOSTROPHE;
+        case '*':   need_shift = true; return KEY_APOSTROPHE;
+
+        case ']':   return KEY_BACKSLASH;
+        case '}':   need_shift = true; return KEY_BACKSLASH;
+
+        case ',':   return KEY_COMMA;
+        case '<':   need_shift = true; return KEY_COMMA;
+
+        case '.':   return KEY_DOT;
+        case '>':   need_shift = true; return KEY_DOT;
+
+        case '/':   return KEY_SLASH;
+        case '?':   need_shift = true; return KEY_SLASH;
+
+        // case '\\':  return KEY_RO;
+        case '_':   need_shift = true; return KEY_RO;
+
+        case '!':   need_shift = true; return KEY_1;
+        case '"':   need_shift = true; return KEY_2;
+        case '#':   need_shift = true; return KEY_3;
+        case '$':   need_shift = true; return KEY_4;
+        case '%':   need_shift = true; return KEY_5;
+        case '&':   need_shift = true; return KEY_6;
+        case '\'':  need_shift = true; return KEY_7;
+        case '(':   need_shift = true; return KEY_8;
+        case ')':   need_shift = true; return KEY_9;
+        // case '~':   need_shift = true; return KEY_0;
+
         default:
             return -1;
     }
