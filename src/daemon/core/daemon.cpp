@@ -5,7 +5,7 @@
 #include <linux/input.h>
 
 // original
-#include "daemon.hpp"
+#include "core/daemon.hpp"
 
 
 namespace phantomboard::daemon

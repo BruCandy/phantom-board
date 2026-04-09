@@ -5,11 +5,12 @@
 #include <string>
 
 // original
-#include "buffer_manager.hpp"
-#include "input_manager.hpp"
-#include "output_manager.hpp"
-#include "state_manager.hpp"
-#include "types.hpp"
+#include "core/buffer_manager.hpp"
+#include "core/input_manager.hpp"
+#include "core/output_manager.hpp"
+#include "core/state_manager.hpp"
+#include "core/types.hpp"
+#include "ime/ibus/ibus_client.hpp"
 
 
 namespace phantomboard::daemon

@@ -7,7 +7,7 @@
 #include <linux/input.h>
 
 // original
-#include "input_manager.hpp"
+#include "core/input_manager.hpp"
 
 
 namespace
