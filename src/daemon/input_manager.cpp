@@ -12,23 +12,23 @@
 
 namespace
 {
-constexpr int alpha_keys[26] = {
+constexpr int alphabet_keys[26] = {
     KEY_A, KEY_B, KEY_C, KEY_D, KEY_E, KEY_F, KEY_G, KEY_H, KEY_I,
     KEY_J, KEY_K, KEY_L, KEY_M, KEY_N, KEY_O, KEY_P, KEY_Q, KEY_R,
     KEY_S, KEY_T, KEY_U, KEY_V, KEY_W, KEY_X, KEY_Y, KEY_Z
 };
 
-int alphaIndex(int code)
+int alphabetIndex(int code)
 {
     for (int i = 0; i < 26; i++) {
-        if (alpha_keys[i] == code) return i;
+        if (alphabet_keys[i] == code) return i;
     }
     return -1;
 }
 
 char keycodeToAscii(int code, bool shift)
 {
-    const int idx = alphaIndex(code);
+    const int idx = alphabetIndex(code);
     if (idx >= 0) {
         const char base = shift ? 'A' : 'a';
         return static_cast<char>(base + idx);
@@ -47,19 +47,20 @@ char keycodeToAscii(int code, bool shift)
     }
 
     switch (code) {
-        case KEY_SPACE:      return ' ';
-        case KEY_MINUS:      return shift ? '=' : '-';
-        case KEY_EQUAL:      return shift ? '+' : '^';
-        case KEY_LEFTBRACE:  return shift ? '{' : '@';
-        case KEY_RIGHTBRACE: return shift ? '}' : '[';
-        case KEY_BACKSLASH:  return shift ? '|' : '\\';
-        case KEY_SEMICOLON:  return shift ? '+' : ';';
-        case KEY_APOSTROPHE: return shift ? '*' : ':';
-        case KEY_GRAVE:      return shift ? '_' : '`';
-        case KEY_COMMA:      return shift ? '<' : ',';
-        case KEY_DOT:        return shift ? '>' : '.';
-        case KEY_SLASH:      return shift ? '?' : '/';
-        default:             return '\0';
+        case KEY_SPACE:         return ' ';
+        case KEY_MINUS:         return shift ? '=' : '-';
+        case KEY_EQUAL:         return shift ? '~' : '^';
+        case KEY_YEN:           return shift ? '|' : '\\';
+        case KEY_LEFTBRACE:     return shift ? '`' : '@';
+        case KEY_RIGHTBRACE:    return shift ? '{' : '[';
+        case KEY_SEMICOLON:     return shift ? '+' : ';';
+        case KEY_APOSTROPHE:    return shift ? '*' : ':';
+        case KEY_BACKSLASH:     return shift ? '}' : ']';
+        case KEY_COMMA:         return shift ? '<' : ',';
+        case KEY_DOT:           return shift ? '>' : '.';
+        case KEY_SLASH:         return shift ? '?' : '/';
+        case KEY_RO:            return shift ? '_' : '\\'; 
+        default:                return '\0';
     }
 }
 }
