@@ -213,4 +213,14 @@ InputAction InputManager::translateEvent(const struct input_event& event)
 
     return action;
 }
+
+bool InputManager::checkPassThroughPress(input_event& event)
+{
+    return (event.type == EV_KEY) && (event.code == KEY_GRAVE) && (event.value == 1);
+}
+
+bool InputManager::checkPassThroughRelease(input_event& event)
+{
+    return (event.type == EV_KEY) && (event.code == KEY_GRAVE) && (event.value == 0);
+}
 }

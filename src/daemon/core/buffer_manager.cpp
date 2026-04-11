@@ -12,11 +12,16 @@ BufferManager::~BufferManager()
 {
 }
 
-bool BufferManager::insertChar(char c) 
+void BufferManager::insertChar(char c) 
 {
     text_.insert(cursor_, 1, c);
     ++cursor_;
-    return true;
+}
+
+void BufferManager::insertString(const std::string& s)
+{
+    text_.insert(cursor_, s);
+    cursor_ += s.size();
 }
 
 bool BufferManager::backSpace() 
@@ -90,7 +95,29 @@ std::string BufferManager::renderForDisplay()
 {
     std::string s = text_;
     s.insert(cursor_, "|");
+
+    if (preedit_visible_) {
+        s.insert(cursor_ + 1, " < " + preedit_ + " > ");
+    }
+
     return s;
+}
+
+void BufferManager::setPreedit(const std::string& s, bool visible)
+{
+    preedit_ = s;
+    preedit_visible_ = visible;
+}
+
+void BufferManager::clearPreedit()
+{
+    preedit_.clear();
+    preedit_visible_ = false;
+}
+
+bool BufferManager::checkPreedit()
+{
+    return preedit_visible_ && !preedit_.empty();
 }
 
 std::string BufferManager::consume()

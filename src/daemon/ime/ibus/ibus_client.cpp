@@ -8,6 +8,7 @@
 
 //original
 #include "ime/ibus/ibus_client.hpp"
+#include "ime/ibus/ibus_callbacks.hpp"
 
 
 namespace phantomboard::daemon
@@ -16,7 +17,7 @@ IBusClient::IBusClient()
 {
 }
 
-IBusClient::~IBusClient() 
+IBusClient::~IBusClient()
 {
     shutdown();
 }
@@ -29,7 +30,7 @@ bool IBusClient::initialize(const std::string& client_name)
 
     bus_ = ibus_bus_new();
     if (bus_ == nullptr) {
-        std::cerr << "Failed to create IBusBus\n";
+        std::cerr << "Failed to create IBus bus\n";
         return false;
     }
 
@@ -61,11 +62,6 @@ bool IBusClient::initialize(const std::string& client_name)
                      G_CALLBACK(handleCommitText),
                      &ime_state_);
 
-    g_signal_connect(ctx_,
-                     "forward-key-event",
-                     G_CALLBACK(handleForwardKeyEvent),
-                     &ime_state_);
-
     ibus_input_context_set_capabilities(
         ctx_,
         IBUS_CAP_PREEDIT_TEXT | IBUS_CAP_FOCUS | IBUS_CAP_SURROUNDING_TEXT
@@ -89,11 +85,9 @@ void IBusClient::shutdown()
         bus_ = nullptr;
     }
 
-    preedit_.clear();
-    preedit_visible_ = false;
-    committed_.clear();
-
-    clearForwardedKey();
+    ime_state_.preedit.clear();
+    ime_state_.preedit_visible = false;
+    ime_state_.committed.clear();
 }
 
 void IBusClient::focusIn()
@@ -124,8 +118,6 @@ bool IBusClient::sendKey(std::uint32_t keyval,
         return false;
     }
 
-    clearForwardedKey();
-
     gboolean handled = ibus_input_context_process_key_event(
         ctx_,
         static_cast<guint>(keyval),
@@ -140,10 +132,10 @@ bool IBusClient::sendKey(std::uint32_t keyval,
     if (!handled) {
         if (keyval >= 0x20 && keyval <= 0x7e) {
             char c = static_cast<char>(keyval);
-            committed_ += c;
+            ime_state_.committed += c;
         } else if (keyval == IBUS_KEY_BackSpace) {
-            if (!committed_.empty()) {
-                committed_.pop_back();
+            if (!ime_state_.committed.empty()) {
+                ime_state_.committed.pop_back();
             }
         }
     }
@@ -151,48 +143,10 @@ bool IBusClient::sendKey(std::uint32_t keyval,
     return handled == TRUE;
 }
 
-void IBusClient::clearForwardedKey()
+std::string IBusClient::takeCommittedText()
 {
-    last_forward_keyval_ = 0;
-    last_forward_keycode_ = 0;
-    last_forward_state_ = 0;
-}
-
-void IBusClient::handleUpdatePreeditText(IBusInputContext*,
-                                         IBusText* text,
-                                         guint cursor_pos,
-                                         gboolean visible,
-                                         ImeState* ime_state)
-{
-    const gchar* s = text ? ibus_text_get_text(text) : "";
-    ime_state->preedit = (s != nullptr) ? s : "";
-    ime_state->preedit_visible = (visible == TRUE);
-}
-
-void IBusClient::handleHidePreeditText(IBusInputContext*, ImeState* ime_state)
-{
-    ime_state->preedit.clear();
-    ime_state->preedit_visible = false;
-}
-
-void IBusClient::handleCommitText(IBusInputContext*,
-                                  IBusText* text
-                                  ImeState* ime_state)
-{
-    const gchar* s = text ? ibus_text_get_text(text) : "";
-    if (s != nullptr) {
-        ime_state->committed += s;
-    }
-}
-
-void IBusClient::handleForwardKeyEvent(IBusInputContext*,
-                                       guint keyval,
-                                       guint keycode,
-                                       guint state
-                                       ImeState* ime_state)
-{
-    last_forward_keyval_ = static_cast<std::uint32_t>(keyval);
-    last_forward_keycode_ = static_cast<std::uint32_t>(keycode);
-    last_forward_state_ = static_cast<std::uint32_t>(state);
+    std::string out = std::move(ime_state_.committed);
+    ime_state_.committed.clear();
+    return out;
 }
 }

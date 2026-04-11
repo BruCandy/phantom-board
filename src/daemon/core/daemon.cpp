@@ -36,6 +36,11 @@ bool Daemon::initialize()
         return false;
     }
 
+    if (!ime_.initialize("phantomboard")) {
+        std::cerr << "Failed to initialize IBus client" << std::endl;
+        return false;
+    }
+
     running_ = true;
     return true;
 }
@@ -48,13 +53,23 @@ void Daemon::run()
             std::cerr << "Failed to read input event" << std::endl;
             break;
         }
-        
+
         const InputAction action = input_.translateEvent(event);
         handleAction(action);
 
         if (!state_.checkPhantom()) {
             if (!output_.throwEvent(event)) {
                 std::cerr << "Failed to throw event" << std::endl;
+            }
+        } else {
+            if (input_.checkPassThroughPress(event)) {
+                output_.emitPassThroughKey(event.code, 1);
+                continue;
+            }
+
+            if (input_.checkPassThroughRelease(event)) {
+                output_.emitPassThroughKey(event.code, 0);
+                continue;
             }
         }
     }
@@ -93,14 +108,24 @@ void Daemon::handleAction(const InputAction& action)
 
     case InputActionType::InsertChar:
         if (state_.checkPhantom() && action.ch.has_value()) {
-            buffer_.insertChar(*action.ch);
+            if (ime_.checkImeActive()) {
+                ime_.sendKey(static_cast<std::uint32_t>(*action.ch), 0, 0);
+                updateBufferfromIme();
+            } else {
+                buffer_.insertChar(*action.ch);
+            }
             std::cout << "Buffer: " << buffer_.renderForDisplay() << std::endl;
         }
         break;
 
     case InputActionType::Backspace:
         if (state_.checkPhantom()) {
-            buffer_.backSpace();
+            if (ime_.checkImeActive() && buffer_.checkPreedit()) {
+                ime_.sendKey(IBUS_KEY_BackSpace, 0, 0);
+                updateBufferfromIme();
+            } else {
+                buffer_.backSpace();
+            }
             std::cout << "Buffer: " << buffer_.renderForDisplay() << std::endl;
         }
         break;
@@ -127,10 +152,16 @@ void Daemon::handleAction(const InputAction& action)
         break;
 
     case InputActionType::EmitBuffer:
-        if (state_.checkPhantom() && !buffer_.empty()) {
-            const std::string text = buffer_.consume();
-            output_.emitText(text);
-            std::cout << "Emit: " << text << std::endl;
+        if (state_.checkPhantom()) {
+            if (ime_.checkImeActive() && buffer_.checkPreedit()) {
+                ime_.sendKey(IBUS_KEY_Return, 0, 0);
+                updateBufferfromIme();
+                std::cout << "Buffer: " << buffer_.renderForDisplay() << std::endl;
+            } else if (!buffer_.empty()) {
+                const std::string text = buffer_.consume();
+                output_.emitText(text);
+                std::cout << "Emit: " << text << std::endl;
+            }
         }
         break;
 
@@ -144,6 +175,16 @@ void Daemon::handleAction(const InputAction& action)
     case InputActionType::Quit:
         stop();
         break;
+    }
+}
+
+void Daemon::updateBufferfromIme()
+{
+    buffer_.setPreedit(ime_.preedit(), ime_.preeditVisible());
+
+    const std::string committed = ime_.takeCommittedText();
+    if (!committed.empty()) {
+        buffer_.insertString(committed);
     }
 }
 }

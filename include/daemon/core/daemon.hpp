@@ -32,6 +32,7 @@ public:
 
 private:
     void handleAction(const InputAction& action);
+    void updateBufferfromIme();
 
     std::string input_device_path_;
     bool running_ = false;
@@ -40,6 +41,7 @@ private:
     BufferManager buffer_{};
     InputManager input_{};
     OutputManager output_{};
+    IBusClient ime_{};
 };
 }
 

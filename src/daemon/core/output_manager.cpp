@@ -246,4 +246,9 @@ bool OutputManager::throwEvent(struct input_event event)
     const ssize_t n = ::write(fd_, &event, sizeof(event));
     return n == static_cast<ssize_t>(sizeof(event));
 }
+
+bool OutputManager::emitPassThroughKey(int keycode, int value)
+{
+    return emitKeyEvent(keycode, value) && emitSyn();
+}
 }

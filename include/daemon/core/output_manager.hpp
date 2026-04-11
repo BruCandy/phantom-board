@@ -28,6 +28,8 @@ public:
 
     bool throwEvent(struct input_event event);
 
+    bool emitPassThroughKey(int keycode, int value);
+
 private:
     int fd_ = -1;
 };

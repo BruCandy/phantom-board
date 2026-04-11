@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.28.3)
 project(phantomboard LANGUAGES CXX)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 find_package(PkgConfig REQUIRED)
 
 pkg_check_modules(GLIB REQUIRED IMPORTED_TARGET
@@ -27,12 +29,9 @@ target_include_directories(phantomboard_daemon
     PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include/daemon
 )
 
-target_compile_features(phantomboard_daemon PUBLIC cxx_std_17)
-
 target_link_libraries(phantomboard_daemon
-    PRIVATE
-        PkgConfig::GLIB
-        PkgConfig::IBUS
+    PUBLIC  PkgConfig::GLIB
+            PkgConfig::IBUS
 )
 
 add_executable(phantomboard-daemon

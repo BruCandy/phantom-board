@@ -16,11 +16,16 @@ public:
     BufferManager();
     ~BufferManager();
 
-    bool insertChar(char c);
+    void insertChar(char c);
+    void insertString(const std::string& s);
     bool backSpace();
     bool deleteChar();
     bool moveLeft();
     bool moveRight();
+
+    void setPreedit(const std::string& s, bool visible);
+    void clearPreedit();
+    bool checkPreedit();
 
     void clear();
     bool empty();
@@ -35,6 +40,9 @@ public:
 private:
     std::string text_{};
     std::size_t cursor_ = 0;
+
+    std::string preedit_{};
+    bool preedit_visible_ = false;
 };
 }
 

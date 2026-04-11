@@ -1,5 +1,5 @@
-#ifndef IBUS_CLIENT
-#define IBUS_CLIENT
+#ifndef IBUS_CLIENT_H
+#define IBUS_CLIENT_H
 
 
 #include <cstdint>
@@ -7,7 +7,9 @@
 
 //pkg
 #include <ibus.h>
-#include <glib.h>
+
+//original
+#include "ime/ibus/ibus_callbacks.hpp"
 
 
 namespace phantomboard::daemon
@@ -18,10 +20,7 @@ public:
     IBusClient();
     ~IBusClient();
 
-    IBusClient(const IBusClient&) = delete;
-    IBusClient& operator=(const IBusClient&) = delete;
-
-    bool initialize(const std::string& client_name = "phantom-board");
+    bool initialize(const std::string& client_name);
     void shutdown();
 
     void focusIn();
@@ -31,46 +30,19 @@ public:
                  std::uint32_t keycode = 0,
                  std::uint32_t state = 0);
 
-    const std::string& preedit() { return preedit_ };
-    bool preeditVisible() { return preedit_visible_ };
-    const std::string& committed() { return committed_ };
-    
-    void clearForwardedKey();
+    const std::string& preedit() { return ime_state_.preedit; };
+    bool preeditVisible() { return ime_state_.preedit_visible; };
+    const std::string& committed() { return ime_state_.committed; };
+
+    std::string takeCommittedText();
+
+    bool checkImeActive() { return ime_state_.ime_active; } ;
 
 private:
-    struct ImeState {
-        bool preedit_visible_;
-        std::string preedit;
-        std::string committed;
-    };
-
-    void connectSignals();
-    void setCapabilities();
-
-    void handleUpdatePreeditText(IBusInputContext*, 
-                                 IBusText* text, 
-                                 guint cursor_pos, 
-                                 gboolean visible,
-                                 ImeState* ime_state);
-    void handleHidePreeditText(IBusInputContext*,
-                               ImeState* ime_state);
-    void handleCommitText(IBusInputContext*,
-                          IBusText* text,
-                          ImeState* ime_state);
-    void handleForwardKeyEvent(IBusInputContext*,
-                               guint keyval, 
-                               guint keycode, 
-                               guint state,
-                               ImeState* ime_state);
-
     struct ImeState ime_state_;
 
     IBusBus* bus_;
     IBusInputContext* ctx_;
-
-    std::uint32_t last_forward_keyval_;
-    std::uint32_t last_forward_keycode_;
-    std::uint32_t last_forward_state_;
 };
 }
 

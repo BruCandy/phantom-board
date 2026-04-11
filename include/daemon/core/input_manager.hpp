@@ -33,6 +33,9 @@ public:
     bool readEvent(struct input_event& event);
     InputAction translateEvent(const struct input_event& event);
 
+    bool checkPassThroughPress(input_event& event);
+    bool checkPassThroughRelease(input_event& event);
+
 private:
     int fd_ = -1;
     bool grabbed_ = false;
