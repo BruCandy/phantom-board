@@ -1,7 +1,7 @@
 # Phantom Board
 
 <p align="center">
-  <img src="data/icons/icon_black.png" alt="Phantom Board icon" width="200">
+  <img src="docs/icons/icon_black.png" alt="Phantom Board icon" width="200">
 </p>
 
 ## Quick Start
@@ -20,3 +20,17 @@ bash daemon_run.sh
 ```bash
 sudo hexdump /dev/input/eventX
 ```
+
+## Commit Message 
+
+I used the following prefixes for commit messages:
+
+- `feat: ` new feature
+- `fix: ` bug fix
+- `docs: ` documentation only changes
+- `refactor: ` code changes that don't change behavior
+- `chore: ` maintenance
+
+Example: 
+
+`feat: add IBus IME support`
