@@ -1,6 +1,6 @@
 #!/bin/bash
 DIR=$(cd "$(dirname "$0")/.." && pwd)
-BUILD="$DIR/build"
+BUILD="$DIR/daemon/build"
 
 cd "$BUILD"
 if [ -e phantomboard-daemon ]; then
