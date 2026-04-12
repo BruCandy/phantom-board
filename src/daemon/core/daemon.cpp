@@ -69,6 +69,7 @@ void Daemon::run()
 
             if (input_.checkPassThroughRelease(event)) {
                 output_.emitPassThroughKey(event.code, 0);
+                ime_.toggleImeActive();
                 continue;
             }
         }

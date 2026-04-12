@@ -38,6 +38,8 @@ public:
 
     bool checkImeActive() { return ime_state_.ime_active; } ;
 
+    void toggleImeActive();
+
 private:
     struct ImeState ime_state_;
 

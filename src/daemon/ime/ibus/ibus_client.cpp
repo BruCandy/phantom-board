@@ -69,6 +69,13 @@ bool IBusClient::initialize(const std::string& client_name)
 
     focusIn();
 
+    ime_state_.ime_active = sendKey(IBUS_KEY_a, 0, 0);
+    if (ime_state_.ime_active) {
+        ime_state_.preedit.clear();
+    } else {
+        ime_state_.committed.clear();
+    }
+
     return true;
 }
 
@@ -148,5 +155,10 @@ std::string IBusClient::takeCommittedText()
     std::string out = std::move(ime_state_.committed);
     ime_state_.committed.clear();
     return out;
+}
+
+void IBusClient::toggleImeActive() 
+{
+    ime_state_.ime_active = (ime_state_.ime_active) ? false : true;
 }
 }
