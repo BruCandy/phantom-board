@@ -1,6 +1,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <cstdio>
+#include <cstdlib>
 
 // linux
 #include <linux/input.h>
@@ -8,114 +9,19 @@
 
 // sys
 #include <sys/ioctl.h>
+#include <sys/wait.h>
 
 // original
 #include "core/output_manager.hpp"
 
 
-namespace
-{
-constexpr int alphabet_keys[26] = {
-    KEY_A, KEY_B, KEY_C, KEY_D, KEY_E, KEY_F, KEY_G, KEY_H, KEY_I,
-    KEY_J, KEY_K, KEY_L, KEY_M, KEY_N, KEY_O, KEY_P, KEY_Q, KEY_R,
-    KEY_S, KEY_T, KEY_U, KEY_V, KEY_W, KEY_X, KEY_Y, KEY_Z
-};
-
-int asciiToKeycode(char c, bool& need_shift)
-{
-    need_shift = false;
-
-    if (c >= 'a' && c <= 'z') {
-        return alphabet_keys[c - 'a'];
-    }
-
-    if (c >= 'A' && c <= 'Z') {
-        need_shift = true;
-        return alphabet_keys[c - 'A'];
-    }
-
-    if (c >= '1' && c <= '9') {
-        return KEY_1 + (c - '1');
-    }
-
-    if (c == '0') {
-        return KEY_0;
-    }
-
-    switch (c) {
-        case ' ':   return KEY_SPACE;
-
-        case '-':   return KEY_MINUS;
-        case '=':   need_shift = true; return KEY_MINUS;
-
-        case '^':   return KEY_EQUAL;
-        case '~':   need_shift = true; return KEY_EQUAL;
-
-        case '\\':  return KEY_YEN;
-        case '|':   need_shift = true; return KEY_YEN; 
-
-        case '@':   return KEY_LEFTBRACE;
-        case '`':   need_shift = true; return KEY_LEFTBRACE;
-
-        case '[':   return KEY_RIGHTBRACE;
-        case '{':   need_shift = true; return KEY_RIGHTBRACE;
-
-        case ';':   return KEY_SEMICOLON;
-        case '+':   need_shift = true; return KEY_SEMICOLON;
-
-        case ':':   return KEY_APOSTROPHE;
-        case '*':   need_shift = true; return KEY_APOSTROPHE;
-
-        case ']':   return KEY_BACKSLASH;
-        case '}':   need_shift = true; return KEY_BACKSLASH;
-
-        case ',':   return KEY_COMMA;
-        case '<':   need_shift = true; return KEY_COMMA;
-
-        case '.':   return KEY_DOT;
-        case '>':   need_shift = true; return KEY_DOT;
-
-        case '/':   return KEY_SLASH;
-        case '?':   need_shift = true; return KEY_SLASH;
-
-        // case '\\':  return KEY_RO;
-        case '_':   need_shift = true; return KEY_RO;
-
-        case '!':   need_shift = true; return KEY_1;
-        case '"':   need_shift = true; return KEY_2;
-        case '#':   need_shift = true; return KEY_3;
-        case '$':   need_shift = true; return KEY_4;
-        case '%':   need_shift = true; return KEY_5;
-        case '&':   need_shift = true; return KEY_6;
-        case '\'':  need_shift = true; return KEY_7;
-        case '(':   need_shift = true; return KEY_8;
-        case ')':   need_shift = true; return KEY_9;
-        // case '~':   need_shift = true; return KEY_0;
-
-        default:
-            return -1;
-    }
-}
-
-bool writeEvent(int fd, int type, int code, int value) {
-    struct input_event event {};
-    event.type = static_cast<__u16>(type);
-    event.code = static_cast<__u16>(code);
-    event.value = value;
-
-    const ssize_t n = ::write(fd, &event, sizeof(event));
-    return n == static_cast<ssize_t>(sizeof(event));
-}
-}
-
-
-namespace phantomboard::daemon 
+namespace phantomboard::daemon
 {
 OutputManager::OutputManager()
 {
 }
 
-OutputManager::~OutputManager() 
+OutputManager::~OutputManager()
 {
     shutdown();
 }
@@ -173,14 +79,15 @@ void OutputManager::shutdown()
     }
 }
 
-bool OutputManager::checkReady()
+bool OutputManager::writeEvent(int fd, int type, int code, int value)
 {
-    return fd_ >= 0;
-}
+    struct input_event event {};
+    event.type = static_cast<__u16>(type);
+    event.code = static_cast<__u16>(code);
+    event.value = value;
 
-int OutputManager::fd()
-{
-    return fd_;
+    const ssize_t n = ::write(fd, &event, sizeof(event));
+    return n == static_cast<ssize_t>(sizeof(event));
 }
 
 bool OutputManager::emitKeyEvent(int keycode, int value)
@@ -214,25 +121,25 @@ bool OutputManager::emitText(const std::string& text)
         return false;
     }
 
-    for (char c : text) {
-        bool need_shift = false;
-        const int keycode = asciiToKeycode(c, need_shift);
-        if (keycode < 0) {
-            continue;
-        }
-
-        if (need_shift) {
-            if (!emitKeyEvent(KEY_LEFTSHIFT, 1)) return false;
-            if (!emitSyn()) return false;
-        }
-
-        if (!emitKey(keycode)) return false;
-
-        if (need_shift) {
-            if (!emitKeyEvent(KEY_LEFTSHIFT, 0)) return false;
-            if (!emitSyn()) return false;
-        }
+    if (!writeClipboard(text)) {
+        return false;
     }
+    usleep(50000);
+
+    if (!emitKeyEvent(KEY_LEFTCTRL, 1)) return false;
+    if (!emitSyn()) return false;
+
+    if (!emitKeyEvent(KEY_V, 1)) return false;
+    if (!emitSyn()) return false;
+
+    if (!emitKeyEvent(KEY_V, 0)) return false;
+    if (!emitSyn()) return false;
+
+    if (!emitKeyEvent(KEY_LEFTCTRL, 0)) return false;
+    if (!emitSyn()) return false;
+
+    usleep(100000);
+    clearClipboard();
 
     return true;
 }
@@ -250,5 +157,40 @@ bool OutputManager::throwEvent(struct input_event event)
 bool OutputManager::emitPassThroughKey(int keycode, int value)
 {
     return emitKeyEvent(keycode, value) && emitSyn();
+}
+
+bool OutputManager::writeClipboard(const std::string& text)
+{
+    int pipefd[2];
+    if (::pipe(pipefd) < 0) {
+        return false;
+    }
+
+    pid_t pid = ::fork();
+    if (pid < 0) {
+        ::close(pipefd[0]);
+        ::close(pipefd[1]);
+        return false;
+    } else if (pid == 0) {
+        ::close(pipefd[1]);
+        ::dup2(pipefd[0], STDIN_FILENO);
+        ::close(pipefd[0]);
+        ::execlp("xclip", "xclip", "-selection", "clipboard", "-in", nullptr);
+        ::_exit(1);
+    } else {
+        ::close(pipefd[0]);
+        const ssize_t written = ::write(pipefd[1], text.data(), text.size());
+        ::close(pipefd[1]);
+
+        int status = 0;
+        ::waitpid(pid, &status, 0);
+
+        return (written == static_cast<ssize_t>(text.size())) && WIFEXITED(status) && (WEXITSTATUS(status) == 0);
+    }
+}
+
+bool OutputManager::clearClipboard()
+{
+    return std::system("printf '' | xclip -selection clipboard") == 0;
 }
 }

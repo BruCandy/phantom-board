@@ -18,17 +18,17 @@ public:
     bool initialize();
     void shutdown();
 
-    bool checkReady();
-    int fd();
-
+    bool writeEvent(int fd, int type, int code, int value);
     bool emitKey(int keycode);
     bool emitKeyEvent(int keycode, int value);
     bool emitSyn();
     bool emitText(const std::string& text);
+    bool emitPassThroughKey(int keycode, int value);
 
     bool throwEvent(struct input_event event);
 
-    bool emitPassThroughKey(int keycode, int value);
+    bool writeClipboard(const std::string& text);
+    bool clearClipboard();
 
 private:
     int fd_ = -1;
