@@ -1,4 +1,5 @@
 #include <cerrno>
+#include <cstdint>
 #include <iostream>
 
 // linux
@@ -38,6 +39,18 @@ bool Daemon::initialize()
 
     if (!ime_.initialize("phantomboard")) {
         std::cerr << "Failed to initialize IBus client" << std::endl;
+        return false;
+    }
+
+    DbusCallbacks callbacks;
+
+    callbacks.get_mode = [this]() -> std::string {
+        return state_.checkPhantom() ? "Phantom" : "Normal";
+    };
+
+    dbus_service_.emplace(std::move(callbacks));
+    if (!dbus_service_->start()) {
+        std::cerr << "Failed to start D-Bus service" << std::endl;
         return false;
     }
 
@@ -103,6 +116,9 @@ void Daemon::handleAction(const InputAction& action)
             output_.emitKeyEvent(KEY_LEFTSHIFT, 0);
             output_.emitKeyEvent(KEY_RIGHTSHIFT, 0);
             output_.emitSyn();
+        }
+        if (dbus_service_) {
+            dbus_service_->emitModeChanged(state_.checkPhantom() ? "Phantom" : "Normal");
         }
         std::cout << std::endl << "Mode: " << (state_.checkPhantom() ? "Phantom" : "Normal") << std::endl;
         break;

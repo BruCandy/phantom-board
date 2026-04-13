@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.28.3)
 project(phantomboard LANGUAGES CXX)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_CXX_STANDARD 20)
 
 find_package(PkgConfig REQUIRED)
 
@@ -15,6 +16,8 @@ pkg_check_modules(IBUS REQUIRED IMPORTED_TARGET
     ibus-1.0
 )
 
+find_package(sdbus-c++ REQUIRED)
+
 add_library(phantomboard_daemon
     src/core/buffer_manager.cpp
     src/core/daemon.cpp
@@ -23,6 +26,8 @@ add_library(phantomboard_daemon
     src/core/state_manager.cpp
     src/ime/ibus/ibus_client.cpp
     src/ime/ibus/ibus_callbacks.cpp
+    src/dbus/dbus_adaptor.cpp
+    src/dbus/dbus_service.cpp
 )
 
 target_include_directories(phantomboard_daemon
@@ -32,6 +37,7 @@ target_include_directories(phantomboard_daemon
 target_link_libraries(phantomboard_daemon
     PUBLIC  PkgConfig::GLIB
             PkgConfig::IBUS
+    PRIVATE SDBusCpp::sdbus-c++
 )
 
 add_executable(phantomboard-daemon

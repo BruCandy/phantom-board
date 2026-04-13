@@ -1,6 +1,4 @@
 #include <iostream>
-
-//pkg
 #include <ibus.h>
 
 //originals

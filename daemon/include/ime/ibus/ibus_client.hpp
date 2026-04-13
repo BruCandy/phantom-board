@@ -43,8 +43,8 @@ public:
 private:
     struct ImeState ime_state_;
 
-    IBusBus* bus_;
-    IBusInputContext* ctx_;
+    IBusBus* bus_ = nullptr;
+    IBusInputContext* ctx_ = nullptr;
 };
 }
 

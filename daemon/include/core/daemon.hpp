@@ -2,6 +2,7 @@
 #define DAEMON_H
 
 
+#include <optional>
 #include <string>
 
 // original
@@ -10,6 +11,7 @@
 #include "core/output_manager.hpp"
 #include "core/state_manager.hpp"
 #include "core/types.hpp"
+#include "dbus/dbus_service.hpp"
 #include "ime/ibus/ibus_client.hpp"
 
 
@@ -42,6 +44,7 @@ private:
     InputManager input_{};
     OutputManager output_{};
     IBusClient ime_{};
+    std::optional<DbusService> dbus_service_;
 };
 }
 

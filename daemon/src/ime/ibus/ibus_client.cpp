@@ -1,8 +1,6 @@
 #include <iostream>
 #include <utility>
 #include <cstdint>
-
-//pkg
 #include <ibus.h>
 #include <glib.h>
 
