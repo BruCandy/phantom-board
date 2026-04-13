@@ -32,6 +32,7 @@ add_library(phantomboard_daemon
 
 target_include_directories(phantomboard_daemon
     PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include/
+           ${CMAKE_CURRENT_SOURCE_DIR}/../include
 )
 
 target_link_libraries(phantomboard_daemon

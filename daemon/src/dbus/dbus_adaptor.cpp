@@ -1,21 +1,26 @@
 #include <utility>
 
 //original
+#include <dbus_configure.hpp>
 #include "dbus/dbus_adaptor.hpp"
-#include "dbus/dbus_configure.hpp"
 
 
 namespace phantomboard::daemon
 {
 DbusAdaptor::DbusAdaptor(sdbus::IConnection& connection, DbusCallbacks callbacks)
-    : callbacks_(std::move(callbacks)), object_(sdbus::createObject(connection, sdbus::ObjectPath{kObjectPath}))
+    : callbacks_(std::move(callbacks)), object_(sdbus::createObject(connection, kObjectPath))
 {
-    object_->addVTable(
-        sdbus::registerMethod("GetMode")
-            .implementedAs([this]() -> std::string {
-                return callbacks_.get_mode ? callbacks_.get_mode() : "";
-            })
-    ).forInterface(kInterfaceName);
+    object_->registerMethod("GetMode")
+        .onInterface(kInterfaceName)
+        .implementedAs([this]() -> std::string {
+            return callbacks_.get_mode ? callbacks_.get_mode() : "";
+        });
+
+    object_->registerSignal("ModeChanged")
+        .onInterface(kInterfaceName)
+        .withParameters<std::string>();
+
+    object_->finishRegistration();
 }
 
 void DbusAdaptor::emitModeChanged(const std::string& mode)

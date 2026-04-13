@@ -2,8 +2,8 @@
 #include <utility>
 
 //original
+#include <dbus_configure.hpp>
 #include "dbus/dbus_service.hpp"
-#include "dbus/dbus_configure.hpp"
 
 
 namespace phantomboard::daemon
@@ -25,7 +25,7 @@ bool DbusService::start()
     }
 
     try {
-        connection_ = sdbus::createSessionBusConnection(sdbus::ServiceName{kServiceName});
+        connection_ = sdbus::createSessionBusConnection(kServiceName);
         adaptor_ = std::make_unique<DbusAdaptor>(*connection_, callbacks_);
         connection_->enterEventLoopAsync();
     }
