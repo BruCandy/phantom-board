@@ -56,16 +56,16 @@ int main(int argc, char *argv[]) {
     auto proxy = sdbus::createProxy(*connection, sdbus::ServiceName{kServiceName}, sdbus::ObjectPath{kObjectPath});
 
     proxy->uponSignal("ModeChanged")
-         .onInterface(kInterfaceName)
-         .call([](const std::string& mode) {
-             g_idle_add(update_icon_idle, g_strdup(mode.c_str()));
-         });
+        .onInterface(kInterfaceName)
+        .call([](const std::string& mode) {
+            g_idle_add(update_icon_idle, g_strdup(mode.c_str()));
+        });
 
     try {
         std::string initial_mode;
         proxy->callMethod("GetMode")
-             .onInterface(kInterfaceName)
-             .storeResultsTo(initial_mode);
+            .onInterface(kInterfaceName)
+            .storeResultsTo(initial_mode);
         set_icon_for_mode(initial_mode.c_str());
     } catch (const sdbus::Error& e) {
         std::cerr << "GetMode failed" << std::endl;
