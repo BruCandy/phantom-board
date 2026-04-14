@@ -27,11 +27,12 @@ sudo hexdump /dev/input/eventX
 
 I used the following prefixes for commit messages:
 
+- `chore: ` maintenance
+- `docs: ` documentation only changes
 - `feat: ` new feature
 - `fix: ` bug fix
-- `docs: ` documentation only changes
 - `refactor: ` code changes that don't change behavior
-- `chore: ` maintenance
+- `style: ` code format only changes
 
 Example: 
 
