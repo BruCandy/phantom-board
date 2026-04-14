@@ -10,9 +10,11 @@
 cd resources
 bash daemon_setup.sh
 bash daemon_build.sh
+bash ui_build.sh
 sudo chmod 666 /dev/input/eventX
 sudo chmod 666 /dev/uinput
 bash daemon_run.sh
+bash ui_run.sh
 ```
 
 ## Test
