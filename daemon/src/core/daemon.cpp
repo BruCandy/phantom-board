@@ -48,6 +48,10 @@ bool Daemon::initialize()
         return state_.checkPhantom() ? "Phantom" : "Normal";
     };
 
+    callbacks.get_buffer_state = [this]() -> std::tuple<std::string, std::string, std::uint32_t> {
+        return { buffer_.committed(), buffer_.preedit(), static_cast<std::uint32_t>(buffer_.cursor()) };
+    };
+
     dbus_service_.emplace(std::move(callbacks));
     if (!dbus_service_->start()) {
         std::cerr << "Failed to start D-Bus service" << std::endl;
@@ -99,11 +103,6 @@ PhantomMode Daemon::mode()
     return state_.getMode();
 }
 
-TextBufferView Daemon::bufferView()
-{
-    return buffer_.view();
-}
-
 void Daemon::handleAction(const InputAction& action)
 {
     switch (action.type) {
@@ -132,6 +131,13 @@ void Daemon::handleAction(const InputAction& action)
                 buffer_.insertChar(*action.ch);
             }
             std::cout << "Buffer: " << buffer_.renderForDisplay() << std::endl;
+            if (dbus_service_) {
+                dbus_service_->emitBufferChanged(
+                    buffer_.committed(),
+                    buffer_.preedit(),
+                    static_cast<std::uint32_t>(buffer_.cursor())
+                );
+            }
         }
         break;
 
@@ -144,6 +150,13 @@ void Daemon::handleAction(const InputAction& action)
                 buffer_.backSpace();
             }
             std::cout << "Buffer: " << buffer_.renderForDisplay() << std::endl;
+            if (dbus_service_) {
+                dbus_service_->emitBufferChanged(
+                    buffer_.committed(),
+                    buffer_.preedit(),
+                    static_cast<std::uint32_t>(buffer_.cursor())
+                );
+            }
         }
         break;
 
@@ -151,6 +164,13 @@ void Daemon::handleAction(const InputAction& action)
         if (state_.checkPhantom()) {
             buffer_.deleteChar();
             std::cout << "Buffer: " << buffer_.renderForDisplay() << std::endl;
+            if (dbus_service_) {
+                dbus_service_->emitBufferChanged(
+                    buffer_.committed(),
+                    buffer_.preedit(),
+                    static_cast<std::uint32_t>(buffer_.cursor())
+                );
+            }
         }
         break;
 
@@ -158,6 +178,13 @@ void Daemon::handleAction(const InputAction& action)
         if (state_.checkPhantom()) {
             buffer_.moveLeft();
             std::cout << "Buffer: " << buffer_.renderForDisplay() << std::endl;
+            if (dbus_service_) {
+                dbus_service_->emitBufferChanged(
+                    buffer_.committed(),
+                    buffer_.preedit(),
+                    static_cast<std::uint32_t>(buffer_.cursor())
+                );
+            }
         }
         break;
 
@@ -165,6 +192,13 @@ void Daemon::handleAction(const InputAction& action)
         if (state_.checkPhantom()) {
             buffer_.moveRight();
             std::cout << "Buffer: " << buffer_.renderForDisplay() << std::endl;
+            if (dbus_service_) {
+                dbus_service_->emitBufferChanged(
+                    buffer_.committed(),
+                    buffer_.preedit(),
+                    static_cast<std::uint32_t>(buffer_.cursor())
+                );
+            }
         }
         break;
 
@@ -179,6 +213,13 @@ void Daemon::handleAction(const InputAction& action)
                 output_.emitText(text);
                 std::cout << "Emit: " << text << std::endl;
             }
+            if (dbus_service_) {
+                dbus_service_->emitBufferChanged(
+                    buffer_.committed(),
+                    buffer_.preedit(),
+                    static_cast<std::uint32_t>(buffer_.cursor())
+                );
+            }
         }
         break;
 
@@ -186,6 +227,13 @@ void Daemon::handleAction(const InputAction& action)
         if (state_.checkPhantom()) {
             buffer_.clear();
             std::cout << "Buffer cleared" << std::endl;
+            if (dbus_service_) {
+                dbus_service_->emitBufferChanged(
+                    buffer_.committed(),
+                    buffer_.preedit(),
+                    static_cast<std::uint32_t>(buffer_.cursor())
+                );
+            }
         }
         break;
 

@@ -30,7 +30,6 @@ public:
     void stop();
 
     PhantomMode mode();
-    TextBufferView bufferView();
 
 private:
     void handleAction(const InputAction& action);

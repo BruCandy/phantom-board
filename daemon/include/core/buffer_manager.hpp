@@ -30,18 +30,17 @@ public:
     void clear();
     bool empty();
 
-    const std::string& text();
+    const std::string& committed();
+    const std::string& preedit();
     std::size_t cursor();
-    TextBufferView view();
 
     std::string renderForDisplay();
     std::string consume();
 
 private:
-    std::string text_{};
-    std::size_t cursor_ = 0;
-
+    std::string committed_{};
     std::string preedit_{};
+    std::size_t cursor_ = 0;
     bool preedit_visible_ = false;
 };
 }

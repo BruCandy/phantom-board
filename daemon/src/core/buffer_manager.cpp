@@ -14,13 +14,13 @@ BufferManager::~BufferManager()
 
 void BufferManager::insertChar(char c) 
 {
-    text_.insert(cursor_, 1, c);
+    committed_.insert(cursor_, 1, c);
     ++cursor_;
 }
 
 void BufferManager::insertString(const std::string& s)
 {
-    text_.insert(cursor_, s);
+    committed_.insert(cursor_, s);
     cursor_ += s.size();
 }
 
@@ -30,18 +30,18 @@ bool BufferManager::backSpace()
         return false;
     }
 
-    text_.erase(cursor_ - 1, 1);
+    committed_.erase(cursor_ - 1, 1);
     --cursor_;
     return true;
 }
 
 bool BufferManager::deleteChar() 
 {
-    if (cursor_ >= text_.size()) {
+    if (cursor_ >= committed_.size()) {
         return false;
     }
 
-    text_.erase(cursor_, 1);
+    committed_.erase(cursor_, 1);
     return true;
 }
 
@@ -57,7 +57,7 @@ bool BufferManager::moveLeft()
 
 bool BufferManager::moveRight() 
 {
-    if (cursor_ >= text_.size()) {
+    if (cursor_ >= committed_.size()) {
         return false;
     }
 
@@ -67,18 +67,23 @@ bool BufferManager::moveRight()
 
 void BufferManager::clear()
 {
-    text_.clear();
+    committed_.clear();
     cursor_ = 0;
 }
 
 bool BufferManager::empty() 
 {
-    return text_.empty();
+    return committed_.empty();
 }
 
-const std::string& BufferManager::text() 
+const std::string& BufferManager::committed() 
 {
-    return text_;
+    return committed_;
+}
+
+const std::string& BufferManager::preedit()
+{
+    return preedit_;
 }
 
 std::size_t BufferManager::cursor() 
@@ -86,14 +91,9 @@ std::size_t BufferManager::cursor()
     return cursor_;
 }
 
-TextBufferView BufferManager::view()
-{
-    return TextBufferView{ text_, cursor_ };
-}
-
 std::string BufferManager::renderForDisplay()
 {
-    std::string s = text_;
+    std::string s = committed_;
     s.insert(cursor_, "|");
 
     if (preedit_visible_) {
@@ -122,7 +122,7 @@ bool BufferManager::checkPreedit()
 
 std::string BufferManager::consume()
 {
-    std::string out = text_;
+    std::string out = committed_;
     clear();
     return out;
 }

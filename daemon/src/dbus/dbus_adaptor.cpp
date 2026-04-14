@@ -14,7 +14,14 @@ DbusAdaptor::DbusAdaptor(sdbus::IConnection& connection, DbusCallbacks callbacks
         sdbus::registerMethod("GetMode").implementedAs([this]() -> std::string {
             return callbacks_.get_mode ? callbacks_.get_mode() : "";
         }),
-        sdbus::registerSignal("ModeChanged").withParameters<std::string>()
+        sdbus::registerMethod("GetBufferState").implementedAs(
+            [this]() -> std::tuple<std::string, std::string, std::uint32_t> {
+                return callbacks_.get_buffer_state
+                     ? callbacks_.get_buffer_state()
+                     : std::make_tuple(std::string{}, std::string{}, std::uint32_t{0});
+        }),
+        sdbus::registerSignal("ModeChanged").withParameters<std::string>(),
+        sdbus::registerSignal("BufferChanged").withParameters<std::string, std::string, std::uint32_t>()
     ).forInterface(kInterfaceName);
 }
 
@@ -23,5 +30,12 @@ void DbusAdaptor::emitModeChanged(const std::string& mode)
     object_->emitSignal("ModeChanged")
         .onInterface(kInterfaceName)
         .withArguments(mode);
+}
+
+void DbusAdaptor::emitBufferChanged(const std::string& committed, const std::string& preedit, std::uint32_t cursor)
+{
+    object_->emitSignal("BufferChanged")
+        .onInterface(kInterfaceName)
+        .withArguments(committed, preedit, cursor);
 }
 }

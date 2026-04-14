@@ -18,7 +18,7 @@ namespace phantomboard::daemon
 class DbusService
 {
 public:
-    explicit DbusService(DbusCallbacks callbacks);
+    DbusService(DbusCallbacks callbacks);
     ~DbusService();
 
     DbusService(const DbusService&) = delete;
@@ -28,6 +28,7 @@ public:
     void stop();
 
     void emitModeChanged(const std::string& mode);
+    void emitBufferChanged(const std::string& committed, const std::string& preedit, std::uint32_t cursor);
 
 private:
     DbusCallbacks callbacks_;

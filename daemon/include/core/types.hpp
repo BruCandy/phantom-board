@@ -34,6 +34,7 @@ struct InputAction {
 
 struct TextBufferView {
     std::string text;
+    std::string preedit;
     std::size_t cursor = 0;
 };
 }

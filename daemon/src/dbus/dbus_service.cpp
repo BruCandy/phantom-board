@@ -59,4 +59,11 @@ void DbusService::emitModeChanged(const std::string& mode)
         adaptor_->emitModeChanged(mode);
     }
 }
+
+void DbusService::emitBufferChanged(const std::string& committed, const std::string& preedit, std::uint32_t cursor)
+{
+    if (adaptor_) {
+        adaptor_->emitBufferChanged(committed, preedit, cursor);
+    }
+}
 }

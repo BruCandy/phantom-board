@@ -16,6 +16,7 @@ namespace phantomboard::daemon
 {
 struct DbusCallbacks {
     std::function<std::string()> get_mode;
+    std::function<std::tuple<std::string, std::string, std::uint32_t>()> get_buffer_state;
 };
 
 class DbusAdaptor
@@ -28,6 +29,7 @@ public:
     DbusAdaptor& operator=(const DbusAdaptor&) = delete;
 
     void emitModeChanged(const std::string& mode);
+    void emitBufferChanged(const std::string& committed, const std::string& preedit, std::uint32_t cursor);
 
 private:
     DbusCallbacks callbacks_;
