@@ -25,7 +25,7 @@ bool DbusService::start()
     }
 
     try {
-        connection_ = sdbus::createSessionBusConnection(kServiceName);
+        connection_ = sdbus::createSessionBusConnection(sdbus::ServiceName{kServiceName});
         adaptor_ = std::make_unique<DbusAdaptor>(*connection_, callbacks_);
         connection_->enterEventLoopAsync();
     }

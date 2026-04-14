@@ -53,14 +53,13 @@ int main(int argc, char *argv[]) {
     app_indicator_set_menu(indicator, GTK_MENU(menu));
 
     auto connection = sdbus::createSessionBusConnection();
-    auto proxy = sdbus::createProxy(*connection, kServiceName, kObjectPath);
+    auto proxy = sdbus::createProxy(*connection, sdbus::ServiceName{kServiceName}, sdbus::ObjectPath{kObjectPath});
 
     proxy->uponSignal("ModeChanged")
          .onInterface(kInterfaceName)
          .call([](const std::string& mode) {
              g_idle_add(update_icon_idle, g_strdup(mode.c_str()));
          });
-    proxy->finishRegistration();
 
     try {
         std::string initial_mode;

@@ -8,19 +8,14 @@
 namespace phantomboard::daemon
 {
 DbusAdaptor::DbusAdaptor(sdbus::IConnection& connection, DbusCallbacks callbacks)
-    : callbacks_(std::move(callbacks)), object_(sdbus::createObject(connection, kObjectPath))
+    : callbacks_(std::move(callbacks)), object_(sdbus::createObject(connection, sdbus::ObjectPath{kObjectPath}))
 {
-    object_->registerMethod("GetMode")
-        .onInterface(kInterfaceName)
-        .implementedAs([this]() -> std::string {
+    object_->addVTable(
+        sdbus::registerMethod("GetMode").implementedAs([this]() -> std::string {
             return callbacks_.get_mode ? callbacks_.get_mode() : "";
-        });
-
-    object_->registerSignal("ModeChanged")
-        .onInterface(kInterfaceName)
-        .withParameters<std::string>();
-
-    object_->finishRegistration();
+        }),
+        sdbus::registerSignal("ModeChanged").withParameters<std::string>()
+    ).forInterface(kInterfaceName);
 }
 
 void DbusAdaptor::emitModeChanged(const std::string& mode)
